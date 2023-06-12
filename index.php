@@ -61,7 +61,12 @@
     Flight::json(["Consulta Actualizada"]);
   });
 
-
+  Flight::route('GET /recetas', function () {
+    $query = Flight::db()->prepare("SELECT * FROM receta");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
 
 Flight::before('json', function () {
     header('Access-Control-Allow-Origin: *');
