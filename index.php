@@ -1,7 +1,6 @@
   <?php
   require 'vendor/autoload.php';
-  Flight::register('db', 'PDO', array("pgsql:host=localhost;port=5432;dbname=db_hospitalbi", 'postgres', 'postgres'));
-
+  Flight::register('db', 'PDO', array("pgsql:host=192.168.0.13;port=5432;dbname=db_hospitalbi", 'postgres', 'postgres'));
   Flight::route('/', function(){
       echo 'hello world!';
   });
@@ -101,12 +100,98 @@
     Flight::json(["Medicamento Registrada"]);
   });
 
-  
+  Flight::route('GET /sala', function () {
+    $query = Flight::db()->prepare("SELECT * FROM sala");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
 
-Flight::before('json', function () {
-    header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: GET,PUT,POST,DELETE');
-    header('Access-Control-Allow-Headers: Content-Type');
+  Flight::route('POST /sala', function () {
+    $estado = Flight::request()->data->estado;
+
+    $sql = "INSERT INTO sala(estado) VALUES (?);";
+    $query = Flight::db()->prepare($sql);
+    $query->bindparam(1, $estado);
+    $query->execute();
+    Flight::json(["Sala Registrada"]);
+  });
+
+  Flight::route('PUT /sala', function () {
+    $id = Flight::request()->data->id;
+    $estado = Flight::request()->data->estado;
+    $sql = "UPDATE sala SET estado=? WHERE id=?";
+    $query = Flight::db()->prepare($sql);
+    $query->bindparam(1, $estado);
+    $query->bindparam(2, $id);
+    $query->execute();
+    Flight::json(["Sala Actualizada"]);
+  });
+
+  Flight::route('GET /internacion', function () {
+    $query = Flight::db()->prepare("SELECT * FROM internacion");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
+
+  Flight::route('POST /internacion', function () {
+    $estado = Flight::request()->data->estado;
+
+    $sql = "INSERT INTO sala(estado) VALUES (?);";
+    $query = Flight::db()->prepare($sql);
+    $query->bindparam(1, $estado);
+    $query->execute();
+    Flight::json(["Sala Registrada"]);
+  });
+
+  Flight::route('PUT /internacion', function () {
+    $id = Flight::request()->data->id;
+    $estado = Flight::request()->data->estado;
+    $sql = "UPDATE sala SET estado=? WHERE id=?";
+    $query = Flight::db()->prepare($sql);
+    $query->bindparam(1, $estado);
+    $query->bindparam(2, $id);
+    $query->execute();
+    Flight::json(["Sala Actualizada"]);
+  });
+
+  Flight::route('GET /kpi1', function () {
+    $query = Flight::db()->prepare("SELECT nombre , count(nombre) as cantidad FROM medicamento group by nombre");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
+  Flight::route('GET /kpi2', function () {
+    $query = Flight::db()->prepare("SELECT doctor , count (doctor) as cantpacientes from internacion group by doctor");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
+  Flight::route('GET /kpi3', function () {
+    $query = Flight::db()->prepare("SELECT estado ,count(estado) as cantidad from sala group by estado");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
+  Flight::route('GET /kpi4', function () {
+    $query = Flight::db()->prepare("SELECT paciente , count(paciente) as cantidadConsultas from consulta group by paciente");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
+
+  Flight::route('GET /kpi5', function () {
+    $query = Flight::db()->prepare("SELECT doctor, count(doctor) from consulta group by doctor");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
+  
+  Flight::before('json', function () {
+      header('Access-Control-Allow-Origin: *');
+      header('Access-Control-Allow-Methods: GET,PUT,POST,DELETE');
+      header('Access-Control-Allow-Headers: Content-Type');
   });
 
 Flight::start();
