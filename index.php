@@ -1,10 +1,10 @@
   <?php
   require 'vendor/autoload.php';
-  Flight::register('db', 'PDO', array("pgsql:host=192.168.0.13;port=5432;dbname=db_hospitalbi", 'postgres', 'postgres'));
+  Flight::register('db', 'PDO', array("pgsql:host=localhost;port=5432;dbname=db_hospitalbi", 'postgres', 'postgres'));
   Flight::route('/', function(){
       echo 'hello world!';
   });
-  
+  //172.17.0.3
   Flight::route('GET /consultas', function () {
     $query = Flight::db()->prepare("SELECT * FROM consulta");
     $query->execute();
@@ -188,10 +188,10 @@
     Flight::json($datos);
   });
   
-  Flight::before('json', function () {
+  /*Flight::before('json', function () {
       header('Access-Control-Allow-Origin: *');
       header('Access-Control-Allow-Methods: GET,PUT,POST,DELETE');
       header('Access-Control-Allow-Headers: Content-Type');
-  });
+  });*/
 
 Flight::start();
