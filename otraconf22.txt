@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      ENV POSTGRES_DB db_hospitalbi
+      ENV POSTGRES_USER postgres
+      ENV POSTGRES_PASSWORD postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  web:
+    image: php:8.2-apache
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html
+
+volumes:
+  wordpress:
+  pgdata:
