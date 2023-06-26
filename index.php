@@ -17,8 +17,8 @@
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
   });
-  Flight::route('GET /consultas/doc/@doctor', function ($doctor) {
-    $query = Flight::db()->prepare("SELECT id,fecha,hora,paciente FROM consulta WHERE doctor = $doctor and fecha = '23-06-2023' and diagnostico is null group by id");
+  Flight::route('GET /consultas/doc/@doctor/@fecha', function ($doctor,$fecha) {
+    $query = Flight::db()->prepare("SELECT id,fecha,hora,paciente FROM consulta WHERE doctor = ($doctor) and fecha = ($fecha) and diagnostico is null group by id");
     $query->execute();
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
