@@ -250,9 +250,9 @@
     Flight::json($datos);
   });
   Flight::route('GET /kpi5/@fechaini/@fechafin', function ($fechaini,$fechafin) {
-    $query = Flight::db()->prepare("SELECT doctor as nombre, count(doctor) as cantidad from consulta as c where TO_DATE(fecha, 'DD-MM-YYYY') >= ($fechaini) and TO_DATE(fecha, 'DD-MM-YYYY')<= ($fechafin) and diagnostico is not null group by nombre");
+    $query = Flight::db()->prepare("SELECT doctor as nombre, count(doctor) as cantidad from consulta as c where TO_DATE(fecha,'DD-MM-YYYY') >= ($fechaini) and TO_DATE(fecha, 'DD-MM-YYYY')<= ($fechafin) and diagnostico is not null group by nombre");
     $query->execute();
-    $datos = $query->fetchAll(PDO::FE TCH_ASSOC);
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
   });
 
