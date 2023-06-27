@@ -1,6 +1,6 @@
   <?php
   require 'vendor/autoload.php';
-  Flight::register('db', 'PDO', array("pgsql:host=db;port=5432;dbname=db_hospitalbi", 'postgres', 'postgres'));
+  Flight::register('db', 'PDO', array("pgsql:host=23.23.183.202;port=5432;dbname=db_hospitalbi", 'postgres', 'postgres'));
   Flight::route('/', function(){
       echo "hello world!";
   });
@@ -17,8 +17,8 @@
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
   });
-  Flight::route('GET /consultas/doc/@doctor', function ($doctor) {
-    $query = Flight::db()->prepare("SELECT id,fecha,hora,paciente FROM consulta WHERE doctor = $doctor and fecha = '23-06-2023' and diagnostico is null group by id");
+  Flight::route('GET /consultas/doc/@doctor/@fecha', function ($doctor,$fecha) {
+    $query = Flight::db()->prepare("SELECT id,fecha,hora,paciente FROM consulta WHERE doctor = ($doctor) and fecha = ($fecha) and diagnostico is null group by id");
     $query->execute();
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
@@ -208,41 +208,55 @@
   });
 
   Flight::route('GET /kpi1', function () {
-    $query = Flight::db()->prepare("SELECT nombre , count(nombre) as cantidad FROM medicamento group by nombre order by  count(nombre) desc LIMIT 4");
+    $query = Flight::db()->prepare("SELECT nombre as nombre , count(nombre) as cantidad FROM medicamento group by nombre order by  count(nombre) desc LIMIT 4");
     $query->execute();
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
   });
+
+  Flight::route('GET /kpi1/@fechaini/@fechafin', function ($fechaini,$fechafin) {
+    $query = Flight::db()->prepare("SELECT nombre as nombre , count(nombre) as cantidad FROM medicamento as m, consulta as c,receta as r where r.idconsulta=c.id and m.idreceta=r.id and TO_DATE(fecha, 'DD-MM-YYYY') >= ($fechaini) and TO_DATE(fecha, 'DD-MM-YYYY')<= ($fechafin) and c.diagnostico is not null group by nombre order by  count(nombre) desc");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FETCH_ASSOC);
+    Flight::json($datos);
+  });
+
   Flight::route('GET /kpi2', function () {
-    $query = Flight::db()->prepare("SELECT doctor , count (doctor) as cantpacientes from internacion group by doctor");
+    $query = Flight::db()->prepare("SELECT doctor as nombre, count (doctor) as cantidad from internacion group by nombre");
     $query->execute();
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
   });
   Flight::route('GET /kpi3', function () {
-    $query = Flight::db()->prepare("SELECT estado ,count(estado) as cantidad from sala group by estado");
+    $query = Flight::db()->prepare("SELECT estado as nombre ,count(estado) as cantidad from sala group by nombre");
     $query->execute();
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
   });
   Flight::route('GET /kpi4', function () {
-    $query = Flight::db()->prepare("SELECT paciente , count(paciente) as cantidadConsultas from consulta group by paciente");
+    $query = Flight::db()->prepare("SELECT paciente as nombre , count(paciente) as cantidad from consulta group by nombre");
     $query->execute();
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
   });
 
   Flight::route('GET /kpi5', function () {
-    $query = Flight::db()->prepare("SELECT doctor, count(doctor) from consulta group by doctor");
+    $query = Flight::db()->prepare("SELECT doctor as nombre, count(doctor) as cantidad from consulta group by nombre");
     $query->execute();
     $datos = $query->fetchAll(PDO::FETCH_ASSOC);
     Flight::json($datos);
   });
+  Flight::route('GET /kpi5/@fechaini/@fechafin', function ($fechaini,$fechafin) {
+    $query = Flight::db()->prepare("SELECT doctor as nombre, count(doctor) as cantidad from consulta as c where TO_DATE(fecha, 'DD-MM-YYYY') >= ($fechaini) and TO_DATE(fecha, 'DD-MM-YYYY')<= ($fechafin) and diagnostico is not null group by nombre");
+    $query->execute();
+    $datos = $query->fetchAll(PDO::FE TCH_ASSOC);
+    Flight::json($datos);
+  });
   
-  Flight::before('json', function () {
+  /*Flight::before('json', function () {
       header('Access-Control-Allow-Origin: *');
       header('Access-Control-Allow-Methods: GET,PUT,POST,DELETE');
       header('Access-Control-Allow-Headers: Content-Type');
-  });
+  });*/
 
 Flight::start();
